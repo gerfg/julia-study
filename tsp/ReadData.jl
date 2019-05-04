@@ -145,16 +145,18 @@ function loadData(file_name::String)
 
             start_index = findfirst(nm->nm == "NODE_COORD_SECTION", dt)
             count = 1
-            temp_geo = []
+            temp_coord = []
 
             for i in 1:data.dimension
-                lat = parse(Float64, dt[start_index+count+1])
-                lng = parse(Float64, dt[start_index+count+2])
+                x = parse(Float64, dt[start_index+count+1])
+                y = parse(Float64, dt[start_index+count+2])
                 
-                push!(temp_geo, GeoLocation(lat, lng))
-                println(lat," ", lng)
+                push!(temp_coord, Coord(x, y))
+                # println(lat," ", lng)
                 count = count + 3
             end
+
+            temp_geo = calc_lat_lng(temp_coord)
 
             for i in 1:data.dimension
                 for j in 1:data.dimension
@@ -162,7 +164,27 @@ function loadData(file_name::String)
                     # println(calc_dist_geo(temp_geo[i], temp_geo[j]))
                 end
             end
+
+        elseif ewt == "ATT"
+            start_index = findfirst(nm->nm == "NODE_COORD_SECTION", dt)
+            count = 1
+            temp_coord = []
+
+            for i in 1:data.dimension
+                x = parse(Float64, dt[start_index+count+1])
+                y = parse(Float64, dt[start_index+count+2])
+                
+                push!(temp_coord, Coord(x, y))
+                count = count + 3
+            end
+
+            for i in 1:data.dimension
+                for j in 1:data.dimension
+                    data.distance_matrix[i,j] = calc_dist_att(temp_coord[i], temp_coord[j])
+                end
+            end
         end
+        
         println(data.name, " - ", data.dimension)
         show_matrix(data.distance_matrix)
         # return data
@@ -183,6 +205,23 @@ function calc_dist_eucl(p1::Coord, p2::Coord)
     return sqrt( (p2.x - p1.x)^2 + (p2.y - p1.y)^2 )
 end
 
+function calc_lat_lng(temp_coord)
+    temp_geo = []
+    for crd in temp_coord
+        deg = trunc(Int, crd.x)
+        min = crd.x - deg
+        lat = π * (deg + 5.0 * min / 3.0 ) / 180.0;
+
+        deg = trunc(Int, crd.y)
+        min = crd.y - deg
+        lng = π * (deg + 5.0 * min / 3.0 ) / 180.0;
+
+        push!(temp_geo, GeoLocation(lat, lng))
+    end
+
+    return temp_geo
+end
+
 function calc_dist_geo(p1::GeoLocation, p2::GeoLocation) 
     RRR = 6378.388
 
@@ -192,6 +231,17 @@ function calc_dist_geo(p1::GeoLocation, p2::GeoLocation)
 
     value = (RRR * acos( 0.5*((1.0+q1)*q2 - (1.0-q1)*q3) ) + 1.0)
     return trunc(value)
+end
+
+function calc_dist_att(p1::Coord, p2::Coord)
+    rij = sqrt( ( ( p1.x - p2.x)^2 + ( p1.y - p2.y)^2 ) / 10 )
+    tij = floor( rij + 0.5 )
+
+    if tij < rij
+        return tij + 1;
+    else
+        return tij;
+    end
 end
 
 end
