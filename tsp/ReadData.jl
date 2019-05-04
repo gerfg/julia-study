@@ -152,7 +152,6 @@ function loadData(file_name::String)
                 y = parse(Float64, dt[start_index+count+2])
                 
                 push!(temp_coord, Coord(x, y))
-                # println(lat," ", lng)
                 count = count + 3
             end
 
@@ -161,7 +160,6 @@ function loadData(file_name::String)
             for i in 1:data.dimension
                 for j in 1:data.dimension
                     data.distance_matrix[i,j] = calc_dist_geo(temp_geo[i], temp_geo[j])
-                    # println(calc_dist_geo(temp_geo[i], temp_geo[j]))
                 end
             end
 
@@ -185,9 +183,7 @@ function loadData(file_name::String)
             end
         end
         
-        println(data.name, " - ", data.dimension)
-        show_matrix(data.distance_matrix)
-        # return data
+        return data
     end
 end
 
