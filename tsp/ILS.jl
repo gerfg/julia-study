@@ -8,18 +8,21 @@ using .SolutionMD
 export run
 
 function run(data)
-    iterILS = 50
-    maxIterILS = 0;
+    iter_ils = 50
+    maxIter_ils = 0;
 
     if data.dimension < 150
-        maxIterILS = data.dimension
+        max_iter_ils = data.dimension
     else
-        maxIterILS = data.dimension/2
+        max_iter_ils = data.dimension/2
     end
 
-    # for iter in 1:iterILS
-        cl = 1:data.dimension
-        println(typeof(cl))
+    # for iter in 1:iterils
+        candidate_list = 1:data.dimension
+        println(typeof(candidate_list), "\n" ,candidate_list)
+        println(candidate_list[5])
+        filter!(x->x≠5, candidate_list)
+        println(typeof(candidate_list), "\n" ,candidate_list)
     # end
 
 end

@@ -15,8 +15,8 @@ struct GeoLocation
     lng::Float64
 end
 
-function loadData(file_name::String)
-    open(ARGS[1], "r") do file 
+function loadData(file_path::String)
+    open(file_path, "r") do file 
         x = read(file, String)
         dt = split(join(split(x, ":")))
 
