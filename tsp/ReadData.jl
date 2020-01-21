@@ -1,7 +1,6 @@
 module ReadData
 
 include("./DataMD.jl")
-using .DataMD
 
 export loadData
 
@@ -23,7 +22,7 @@ function loadData(file_path::String)
         name = dt[findfirst(nm->nm == "NAME", dt)+1]
         dim = parse(Int, dt[findfirst(nm->nm == "DIMENSION", dt)+1])
 
-        data = Data(name, dim, zeros(Float64, dim, dim))
+        data = DataMD.Data(name, dim, zeros(Float64, dim, dim))
 
         ewt = dt[findfirst(nm->nm == "EDGE_WEIGHT_TYPE", dt)+1]
 

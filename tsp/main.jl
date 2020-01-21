@@ -7,4 +7,9 @@ if isempty(ARGS) || length(ARGS) > 1
 end
 
 data = ReadData.loadData(ARGS[1])
-ILS.run(data)
+
+for i=1:5
+    ILS.run(data)
+end
+# @time begin
+# end
