@@ -6,7 +6,7 @@ mutable struct Solution
     customers::Array{Int}
     cost::Float64
 
-    Solution() = new(Array{Int, 1}(undef, 0), 0.0)
+    Solution() = new(Array{Int, 1}(undef, 0), Inf)
 end
 
 function add_client_to!(sol, client, position)

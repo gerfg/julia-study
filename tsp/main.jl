@@ -8,8 +8,6 @@ end
 
 data = ReadData.loadData(ARGS[1])
 
-for i=1:5
-    ILS.run(data)
-end
+ILS_RVND.run(data)
 # @time begin
 # end

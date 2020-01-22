@@ -1,13 +1,17 @@
-module ILS
+module ILS_RVND
 
 include("./DataMD.jl")
 include("./SolutionMD.jl")
+include("./rvnd/rvnd.jl")
 
 export run
 
 function run(data)
-    iter_ils = 0
-    maxIter_ils = 50
+    max_iter_ils = 50
+
+    best_sol = SolutionMD.Solution() # s*
+    ils_loop_sol = SolutionMD.Solution() # s
+    current_best_sol = SolutionMD.Solution() # s'
 
     if data.dimension < 150
         max_iter_ils = data.dimension
@@ -15,21 +19,24 @@ function run(data)
         max_iter_ils = data.dimension/2
     end
 
-    initial_solution(data)
-    # for iter in 1:iterils
+    # for iter in 1:max_iter_ils
         
-        # println(typeof(candidate_list), "\n" ,candidate_list)
-        # println(candidate_list[5])
-        # filter!(x->x≠5, candidate_list)
-        # println(typeof(candidate_list), "\n" ,candidate_list)
+        ils_loop_sol = initial_solution(data) # construction
+        # current_best_sol = deepcopy(ils_loop_sol) # s' = s 
+        # iter_ils = 0
+        # while iter_ils < max_iter_ils
+            # rvnd
+            RVND.run(data, ils_loop_sol)
+        # end
     # end
 end
 
 function initial_solution(data)
     candidate_list = Array(1:data.dimension)
     solution = SolutionMD.Solution()
-    
-    for i = 1:5
+
+    num_random_clients = 3
+    for i = 1:num_random_clients
         client = get_random_client!(candidate_list)
         SolutionMD.append_client!(solution, client)
     end
@@ -40,7 +47,8 @@ function initial_solution(data)
         cheaper_insertion!(solution, data, client)
     end
 
-    println(solution)
+    println("Initial Solution: ", solution)
+    return solution
 end
 
 function cheaper_insertion!(sol, data, customer_evaluate)
@@ -50,12 +58,12 @@ function cheaper_insertion!(sol, data, customer_evaluate)
     for i = 2:length(sol.customers)
         customer_behind, customer = sol.customers[i-1], sol.customers[i]
 
-        cost = 0.0
-        cost -= data.distance_matrix[customer_behind, customer]
-        cost += data.distance_matrix[customer_behind, customer_evaluate] + data.distance_matrix[customer_evaluate, customer]
+        computed_cost = 0.0
+        computed_cost -= data.distance_matrix[customer_behind, customer]
+        computed_cost += data.distance_matrix[customer_behind, customer_evaluate] + data.distance_matrix[customer_evaluate, customer]
 
-        if cost < best_cost
-            best_cost = cost
+        if computed_cost < best_cost
+            best_cost = computed_cost
             position = i
         end
     end
